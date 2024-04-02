@@ -1,5 +1,3 @@
-import axios from "axios";
-
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
@@ -20,18 +18,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 			auth: false
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-
 			login: async (dataEmail, dataPassword) => {
-				
 				try {
-					let data = await axios.post('https://refactored-halibut-jxrrj6vxrqrfjj69-3001.app.github.dev/api/login', {
-						email:dataEmail,
-						password:dataPassword
-					})
+					let response = await fetch('http://localhost:3001/api/login', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({
+							email: dataEmail,
+							password: dataPassword
+						})
+					});
+					let data = await response.json();
 					console.log(data);
-					localStorage.setItem("token",data.data.access_token)
-					setStore({auth:true})
+					localStorage.setItem("token", data.access_token);
+					setStore({ auth: true });
 					return true;
 				} catch (error) {
 					console.log(error);
@@ -40,15 +42,20 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			signup: async (dataEmail, dataPassword) => {
-				
 				try {
-					let data = await axios.post('https://refactored-halibut-jxrrj6vxrqrfjj69-3001.app.github.dev/api/signup', {
-						email:dataEmail,
-						password:dataPassword
-					})
+					let response = await fetch('http://localhost:3001/api/signup', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({
+							email: dataEmail,
+							password: dataPassword
+						})
+					});
+					let data = await response.json();
 					console.log(data);
-					localStorage.setItem("token",data.data.access_token)
-					// setStore({token:data.data.access_token})
+					localStorage.setItem("token", data.access_token);
 					return true;
 				} catch (error) {
 					console.log(error);
@@ -57,36 +64,36 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			getProfile: async () => {
-				// let token = localStorage.getItem("token")
-				
 				try {
-					let data = await axios.get('https://refactored-halibut-jxrrj6vxrqrfjj69-3001.app.github.dev/api/profile', {
-						Headers: {
-							"Authorization": `Bearer ${localStorage.getItem("token")}`,
+					let response = await fetch('http://localhost:3001/api/profile', {
+						headers: {
+							"Authorization": `Bearer ${localStorage.getItem("token")}`
 						}
-					})
+					});
+					let data = await response.json();
 					console.log(data);
-					// localStorage.setItem("token",data.data.access_token)
-					setStore({auth:true})
+					setStore({ auth: true });
 					return true;
 				} catch (error) {
 					console.log(error);
-					setStore({auth:false})
+					setStore({ auth: false });
 					return false;
 				}
 			},
 
 			logout: () => {
-				localStorage.removeItem("token")
-				return false
+				localStorage.removeItem("token");
+				return false;
 			},
+
 			validToken: async () => {
 				try {
-					let data = await axios.get('https://refactored-halibut-jxrrj6vxrqrfjj69-3001.app.github.dev/api/profile', {
-						Headers: {
-							"Authorization": `Bearer ${localStorage.getItem("token")}`,
+					let response = await fetch('http://localhost:3001/api/profile', {
+						headers: {
+							"Authorization": `Bearer ${localStorage.getItem("token")}`
 						}
-					})
+					});
+					let data = await response.json();
 					console.log(data);
 					return true;
 				} catch (error) {
@@ -100,29 +107,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			getMessage: async () => {
-				try{
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
-					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
+				try {
+					const response = await fetch("http://localhost:3001/api/hello");
+					const data = await response.json();
+					setStore({ message: data.message });
 					return data;
-				}catch(error){
-					console.log("Error loading message from backend", error)
+				} catch (error) {
+					console.log("Error loading message from backend", error);
 				}
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
+			changeColor: (index, color) => {
+				const store = getStore();
 				const demo = store.demo.map((elm, i) => {
 					if (i === index) elm.background = color;
 					return elm;
 				});
-
-				//reset the global store
 				setStore({ demo: demo });
 			}
 		}

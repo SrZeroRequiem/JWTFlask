@@ -10,6 +10,41 @@ from flask_jwt_extended import jwt_required
 
 api = Blueprint('api', __name__)
 
+# POPULATE USERS
+@api.route('/populate-users', methods=['POST'])
+def populate_users():
+    users = [
+        {
+            "email": "user1@example.com",
+            "password": "password1",
+            "is_active": True
+        },
+        {
+            "email": "user2@example.com",
+            "password": "password2",
+            "is_active": True
+        },
+        {
+            "email": "user3@example.com",
+            "password": "password3",
+            "is_active": True
+        }
+    ]
+
+    for user_data in users:
+        email = user_data["email"]
+        password = user_data["password"]
+        is_active = user_data["is_active"]
+
+        user = User(email=email, password=password, is_active=is_active)
+        db.session.add(user)
+
+    db.session.commit()
+
+    response_body = {
+        "message": "Users populated"
+    }
+    return jsonify(response_body), 200
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
