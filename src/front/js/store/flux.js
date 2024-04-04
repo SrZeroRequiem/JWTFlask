@@ -2,25 +2,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			message: null,
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			],
-			token:"",
+			user: {
+				email: null
+			},
 			auth: false
 		},
 		actions: {
 			login: async (dataEmail, dataPassword) => {
+				const actions = getActions();
 				try {
-					let response = await fetch('http://localhost:3001/api/login', {
+					const response = await fetch('http://localhost:3001/api/login', {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'
@@ -30,11 +21,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 							password: dataPassword
 						})
 					});
-					let data = await response.json();
-					console.log(data);
+					const data = await response.json();
+					console.log("Login"+data);
 					localStorage.setItem("token", data.access_token);
-					setStore({ auth: true });
-					return true;
+					const validate = await actions.validateLogin();
+					return validate;
 				} catch (error) {
 					console.log(error);
 					return false;
@@ -43,7 +34,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			signup: async (dataEmail, dataPassword) => {
 				try {
-					let response = await fetch('http://localhost:3001/api/signup', {
+					const response = await fetch('http://localhost:3001/api/signup', {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'
@@ -53,7 +44,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 							password: dataPassword
 						})
 					});
-					let data = await response.json();
+					const data = await response.json();
 					console.log(data);
 					localStorage.setItem("token", data.access_token);
 					return true;
@@ -63,21 +54,40 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			getProfile: async () => {
+			validateLogin: async () => {
 				try {
-					let response = await fetch('http://localhost:3001/api/profile', {
+					const response = await fetch('http://localhost:3001/api/validate', {
 						headers: {
 							"Authorization": `Bearer ${localStorage.getItem("token")}`
 						}
 					});
-					let data = await response.json();
-					console.log(data);
+					const data = await response.json();
+					if (response.status >= 400 && response.status < 500) {
+						throw new Error(data.msg);
+					}
 					setStore({ auth: true });
 					return true;
 				} catch (error) {
 					console.log(error);
 					setStore({ auth: false });
 					return false;
+				}
+			},
+
+			getProfile: async () => {
+				const store = getStore();
+				try {
+					const response = await fetch('http://localhost:3001/api/profile', {
+						headers: {
+							"Authorization": `Bearer ${localStorage.getItem("token")}`
+						}
+					});
+					const data = await response.json();
+					setStore({ user: data });
+					return null;
+				} catch (error) {
+					console.log(error);
+					return null;
 				}
 			},
 
@@ -88,12 +98,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			validToken: async () => {
 				try {
-					let response = await fetch('http://localhost:3001/api/profile', {
+					const response = await fetch('http://localhost:3001/api/profile', {
 						headers: {
 							"Authorization": `Bearer ${localStorage.getItem("token")}`
 						}
 					});
-					let data = await response.json();
+					const data = await response.json();
 					console.log(data);
 					return true;
 				} catch (error) {

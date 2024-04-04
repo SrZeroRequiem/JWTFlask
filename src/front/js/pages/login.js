@@ -12,14 +12,15 @@ export const Login = () => {
 
     async function handleSubmit(e) {
         e.preventDefault()
-        // console.log(email, password);
-        // Retorna un booleano => true si esta logeado y false  si no
-        let logged = await actions.login(email, password)
-        if (logged) {
-            navigate('/')
-        }else {
-            alert("No te has logueado correctamente")
-        }
+        console.log(email
+            , password)
+        let logged = await actions.login(email, password).then((res) => {
+            if (res) {
+                navigate('/')
+            }else {
+                alert("No te has logueado correctamente")
+            }
+        })
         setEmail("")
         setPassword("")
     }

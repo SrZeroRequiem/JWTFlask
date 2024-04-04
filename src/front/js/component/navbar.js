@@ -28,7 +28,10 @@ export const Navbar = () => {
 					<Link to="/signup">
 						<button className="btn btn-primary  me-2">Sign Up</button>
 					</Link>
-					<Link to="/login">
+					<Link to="/profile">
+						<button className="btn btn-primary  me-2">Profile</button>
+					</Link>
+					<Link to="/">
 						{store.auth ? <button className="btn btn-primary" onClick={handleLogout}>Logout</button>:null}
 					</Link>
 				</div>
